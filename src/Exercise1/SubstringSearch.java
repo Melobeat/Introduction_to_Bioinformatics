@@ -12,16 +12,18 @@ import java.util.Arrays;
  */
 public class SubstringSearch {
 
-    private static final String SEQUENCE_PATH = "C:\\Users\\kaikr\\Downloads\\sequence.fasta";
-    private static final String PATTERN_PATH = "C:\\Users\\kaikr\\Downloads\\pattern.fasta";
-
     public static void main(String[] args) {
 
-        ArrayList<String> patterns = loadFasta(PATTERN_PATH);
-        ArrayList<String> sequences = loadFasta(SEQUENCE_PATH);
+        if (args.length != 2) {
+            System.out.println("Geben Sie bitte \"pattern.fasta\" und \"sequence.fasta\" als Argumente an!");
+            System.exit(1);
+        }
+
+        ArrayList<String> patterns = loadFasta(args[0]);
+        ArrayList<String> sequences = loadFasta(args[1]);
 
         for (String pattern : patterns) {
-            for (String sequence : sequences){
+            for (String sequence : sequences) {
                 patternSearch(pattern, sequence);
             }
         }
@@ -80,7 +82,7 @@ public class SubstringSearch {
                 }
             }
         }
-        System.out.println("[" + pattern + "]: " + occurences);
+        System.out.println(pattern + ": " + occurences);
         System.out.println(Arrays.toString(positions));
     }
 
