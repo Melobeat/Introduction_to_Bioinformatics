@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by kaikr on 30.04.2017.
@@ -16,26 +17,27 @@ public class SubstringSearch {
 
     public static void main(String[] args) {
 
-        double time = System.currentTimeMillis();
         ArrayList<String> patterns = loadFasta(PATTERN_PATH);
         ArrayList<String> sequences = loadFasta(SEQUENCE_PATH);
-        System.out.println((System.currentTimeMillis() - time) * 0.001 + " s");
-        System.out.println(sequences.get(0).length());
+
+        for (String pattern : patterns) {
+            for (String sequence : sequences){
+                patternSearch(pattern, sequence);
+            }
+        }
 
     }
 
     private static ArrayList<String> loadFasta(String file) {
 
         ArrayList<String> strings = new ArrayList<>();
-        int i = -1;
-        int j = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String sCurrentLine;
             StringBuilder sb = new StringBuilder("");
+            int i = -1;
 
             while ((sCurrentLine = br.readLine()) != null) {
-                System.out.println(j++);
                 if (sCurrentLine.charAt(0) == '>') {
                     if (i < 0) {
                         i++;
@@ -56,6 +58,30 @@ public class SubstringSearch {
         }
 
         return strings;
+    }
+
+    private static void patternSearch(String pattern, String sequence) {
+        int occurences = 0;
+        int[] positions = new int[10];
+        for (int i = 0; i < sequence.length() - pattern.length(); i++) {
+            int k = i;
+            for (int j = 0; j < pattern.length(); j++) {
+                if (pattern.charAt(j) != sequence.charAt(k)) {
+                    break;
+                } else {
+                    if (j == pattern.length() - 1) {
+                        if (occurences < 10) {
+                            positions[occurences] = i + 1;
+                        }
+                        occurences++;
+                        break;
+                    }
+                    k++;
+                }
+            }
+        }
+        System.out.println("[" + pattern + "]: " + occurences);
+        System.out.println(Arrays.toString(positions));
     }
 
 }
