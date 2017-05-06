@@ -15,16 +15,18 @@ public class SubstringSearch {
 
     public static void main(String[] args) {
 
-        double time = System.currentTimeMillis();
-
         if (args.length != 2) {
             System.out.println("Geben Sie bitte \"pattern.fasta\" und \"sequence.fasta\" als Argumente an!");
             System.exit(1);
         }
 
+        double time = System.currentTimeMillis();
+
         // Jeweils eine ArrayList für die Sequenzen und die Pattern, welche mit der Methode loadFasta gefüllt werden
         ArrayList<String> patterns = loadFasta(args[0]);
         ArrayList<String> sequences = loadFasta(args[1]);
+
+        double timeFasta = System.currentTimeMillis() - time;
 
         for (String sequence : sequences) {
             for (String pattern : patterns) {
@@ -32,13 +34,18 @@ public class SubstringSearch {
             }
         }
 
+        double timeSearch = System.currentTimeMillis() - timeFasta - time;
+
         // Laufzeit in Millisekunden
+        System.out.println("Time needed for .fasta loading: " + timeFasta + "ms");
+        System.out.println("Time needed for searching patterns: " + timeSearch + "ms");
         System.out.println("Time needed: " + (System.currentTimeMillis() - time) + "ms");
 
     }
 
     /**
      * Methode für das Laden einer .fasta in den Hauptspeicher
+     *
      * @param file .fasta Datei
      * @return ArrayList mit einzelenen Sequencen/Pattern
      */
@@ -77,7 +84,8 @@ public class SubstringSearch {
 
     /**
      * Methode um eine Sequence nach einer Pattern zu durchsuchen
-     * @param pattern Eine Pattern in Form eines Strings
+     *
+     * @param pattern  Eine Pattern in Form eines Strings
      * @param sequence Eine Sequence in Form eines Strings
      */
     private static void patternSearch(String pattern, String sequence) {
