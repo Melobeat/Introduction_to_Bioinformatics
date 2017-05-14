@@ -1,1 +1,121 @@
+import java.io.*;
 
+public class alignment {
+	private final static int gapCost=-8;
+	
+	
+	
+	private static int[][] fillDotplot(String[] pairs, int[][] matrix) {
+		int dotplot[][] = new int[pairs[0].length()][pairs[1].length()];
+		//1.Zeile auf Null setzen
+		for (int i=0; i < pairs[0].length(); i++){
+			dotplot[i][0]=0;
+		}
+		//1.Spalte auf Null setzen
+		for (int i=0; i < pairs[1].length(); i++){
+			dotplot[0][i]=0;
+		}
+		// Berechne die Matrixwerte
+		for (int i=1; i<pairs[0].length(); i++){
+			for(int j=1; j < pairs[1].length();j++){
+				int a = dotplot[i][j-1]+gapCost;
+				int b = dotplot[i-1][j]+gapCost;
+				int c = dotplot[i-1][j-1]+alignCost(pairs, matrix, i,j);
+				int d = 0;
+				int temp1 = Math.max(a, b);
+				int temp2 = Math.max(c, d);
+				dotplot[i][j] = Math.max(temp1,temp2);
+			}
+		}
+		return dotplot;
+	   }
+	
+	private static int alignCost(String[] pairs, int[][] matrix, int i, int j) {
+		char base1 = pairs[0].charAt(i);
+		int k = baseNumber (base1);
+		char base2 = pairs[1].charAt(j);
+		int l = baseNumber(base2);
+		return matrix[k][l];
+	}
+	private static int baseNumber(char base) {
+		switch (base){
+		case 'A': return 0;
+		case 'T': return 1;
+		case 'G': return 2;
+		case 'C': return 3;
+		default: return 4;
+		}
+	}
+
+
+	
+	
+    private static String[] loadFasta(String file) {
+		String[] pairs = new String[2];
+		String temp;
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+			for (int i=0; i<2;i++){
+	            temp = br.readLine();
+	            if(temp != null){
+	                while(temp.charAt(0) == '>'){
+	                temp = br.readLine();
+	                }
+	            pairs[i]=temp;
+	            }
+			}
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return pairs;
+    }
+	
+    private static int[][] loadMatrix(String file) {
+		int[][] matrix = new int[5][5];
+	       String temp = null;
+	       try (BufferedReader br = new BufferedReader(new FileReader(file))){
+	           temp = br.readLine();
+	           if(temp != null){
+	        	   while(temp.charAt(0) == '#'){  //alle Zeilen die mit # anfangen herausnehmen
+		                temp = br.readLine();
+		           }
+	        	   temp = br.readLine(); //erste Zeile mit ATGC herausnehmen
+	        	   int j=0;
+	   	        	while(temp != null){
+	   	        		for(int i=4; i<temp.length(); i=i+4){
+	   	        			if(temp.charAt(i-1) == '-')matrix[j][i/4-1] = (Character.getNumericValue(temp.charAt(i)))*-1;
+	   	        			else matrix[j][i/4-1] = (Character.getNumericValue(temp.charAt(i)));   
+	   	            }
+	   	            if(j == 4)
+		                break;
+		            j++;
+		            temp = br.readLine();
+		        }
+		        for(int k=0; k<matrix.length; k++){
+		            matrix[4][k]=gapCost;
+		            matrix[k][4]=gapCost;
+		        }
+	           }
+	       }catch(IOException e){
+	                e.printStackTrace();
+	        }
+        return matrix;
+    }	
+	
+	public static void main(String[] args) throws FileNotFoundException, IOException {
+
+		if (args.length != 2) {
+			System.out.println("Geben Sie bitte \"pairs.fasta\" und \"matrix.txt\" als Argumente an!");
+			System.exit(1);
+	    }
+
+        String[] pairs = loadFasta(args[0]);
+        System.out.println("Pairs loaded");
+        int[][] matrix = loadMatrix(args[1]);
+		System.out.println("Matrix loaded");
+		int[][] dotplot = fillDotplot(pairs, matrix);
+		System.out.println("Dotplot loaded");
+		
+		
+		
+	}
+}
