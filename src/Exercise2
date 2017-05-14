@@ -5,30 +5,134 @@ public class alignment {
 	
 	
 	
-	private static int[][] fillDotplot(String[] pairs, int[][] matrix) {
+	private static void fillDotplot(String[] pairs, int[][] matrix) {
 		int dotplot[][] = new int[pairs[0].length()][pairs[1].length()];
+		char dotway [][] = new char[pairs[0].length()][pairs[1].length()];
 		//1.Zeile auf Null setzen
 		for (int i=0; i < pairs[0].length(); i++){
 			dotplot[i][0]=0;
+			dotway[i][0]='x';
 		}
 		//1.Spalte auf Null setzen
 		for (int i=0; i < pairs[1].length(); i++){
 			dotplot[0][i]=0;
+			dotway[0][i]='x';
 		}
 		// Berechne die Matrixwerte
 		for (int i=1; i<pairs[0].length(); i++){
 			for(int j=1; j < pairs[1].length();j++){
-				int a = dotplot[i][j-1]+gapCost;
-				int b = dotplot[i-1][j]+gapCost;
-				int c = dotplot[i-1][j-1]+alignCost(pairs, matrix, i,j);
-				int d = 0;
-				int temp1 = Math.max(a, b);
-				int temp2 = Math.max(c, d);
-				dotplot[i][j] = Math.max(temp1,temp2);
+				int l = dotplot[i-1][j]+gapCost;
+				int u = dotplot[i][j-1]+gapCost;
+				int d = dotplot[i-1][j-1]+alignCost(pairs, matrix, i,j);
+				int x = 0;
+				//Finde das Maximum
+				if (x>=d && x>=u && x>=l){
+					dotplot[i][j] = x;
+					dotway [i][j] = 'x';
+				}
+				else if (l>=d && l>=u && l>=x){
+					dotplot[i][j] = l;
+					dotway [i][j] = 'l';
+				}	
+				else if (u>=d && u>=l && u>=x){
+					dotplot[i][j] = u;
+					dotway [i][j] = 'u';
+				}	
+				else {
+					dotplot[i][j] = d;
+					dotway [i][j] = 'd';	
+				}
+			}
+	   }
+		findeMax(dotplot, dotway, pairs);
+	}
+	
+	private static void findeMax(int[][]dotplot, char[][]dotway, String[] pairs) {
+		int max = 0;
+		int maxi = 0;
+		int maxj = 0;
+		for (int i=1; i<pairs[0].length(); i++){
+			for(int j=1; j < pairs[1].length();j++){
+				if (dotplot[i][j] > max){ 
+					max = dotplot[i][j];
+					maxi = i;
+					maxj = j;
+				}
 			}
 		}
-		return dotplot;
-	   }
+		printAlignmentPair1 (dotplot, dotway, pairs, max, maxi, maxj);
+		printAlignmentBetween (dotplot, dotway, pairs, max, maxi, maxj);
+		printAlignmentPair2 (dotplot, dotway, pairs, max, maxi, maxj);
+	}
+	
+	private static void printAlignmentPair1(int[][]dotplot, char[][]dotway, String[] pairs, int max, int i, int j) {
+		String DNA1 ="";
+		while (dotplot[i][j]!=0){
+			switch (dotway[i][j]){
+				case 'l': i = i-1;
+				DNA1 = DNA1 + pairs[0].charAt(i);
+						break;
+				case 'u': j = j-1;
+				DNA1 = DNA1 + "_";
+						break;
+				case 'd': i=i-1;
+						j= j-1;
+				DNA1 = DNA1 + pairs[0].charAt(i);
+						break;
+				default: break;
+			}
+		}
+		String reverse = new StringBuffer(DNA1).reverse().toString();
+		System.out.println(reverse);
+	}
+	
+	private static void printAlignmentBetween(int[][]dotplot, char[][]dotway, String[] pairs, int max, int i, int j) {
+		String Between ="";
+		while (dotplot[i][j]!=0){
+			switch (dotway[i][j]){
+				case 'l': i = i-1;
+						Between= Between + " ";
+						break;
+				case 'u': j = j-1;
+						Between = Between + " ";
+						break;
+				case 'd': i=i-1;
+						j= j-1;
+						if (pairs[0].charAt(i) == pairs[1].charAt(j)){
+							Between = Between + "|";	
+						}
+						else Between = Between + ".";
+						break;
+				default: break;
+			}
+		}
+		String reverse = new StringBuffer(Between).reverse().toString();
+		System.out.println(reverse);
+	}
+	
+	private static void printAlignmentPair2(int[][]dotplot, char[][]dotway, String[] pairs, int max, int i, int j) {
+		String DNA2 ="";
+		while (dotplot[i][j]!=0){
+
+			switch (dotway[i][j]){
+				case 'l': i = i-1;
+						DNA2 = DNA2 + '_';
+						break;
+				case 'u': j = j-1;
+						DNA2 = DNA2 + pairs[1].charAt(j);
+						break;
+				case 'd': i=i-1;
+						j= j-1;
+						DNA2 = DNA2 + pairs[1].charAt(j);
+						break;
+				default: break;
+			}
+		}
+		String reverse = new StringBuffer(DNA2).reverse().toString();
+		System.out.println(reverse);
+	}
+	
+
 	
 	private static int alignCost(String[] pairs, int[][] matrix, int i, int j) {
 		char base1 = pairs[0].charAt(i);
@@ -109,13 +213,7 @@ public class alignment {
 	    }
 
         String[] pairs = loadFasta(args[0]);
-        System.out.println("Pairs loaded");
         int[][] matrix = loadMatrix(args[1]);
-		System.out.println("Matrix loaded");
-		int[][] dotplot = fillDotplot(pairs, matrix);
-		System.out.println("Dotplot loaded");
-		
-		
-		
+		fillDotplot(pairs, matrix);		
 	}
 }
