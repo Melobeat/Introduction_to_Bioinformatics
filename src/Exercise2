@@ -2,7 +2,7 @@ import java.io.*;
 
 public class alignment {
 	private final static int gapCost=-8;
-	
+	public static int length, matches, replacements, deletions;
 	
 	
 	private static void fillDotplot(String[] pairs, int[][] matrix) {
@@ -60,9 +60,17 @@ public class alignment {
 				}
 			}
 		}
+		System.out.println("Alignment:");
 		printAlignmentPair1 (dotplot, dotway, pairs, max, maxi, maxj);
 		printAlignmentBetween (dotplot, dotway, pairs, max, maxi, maxj);
 		printAlignmentPair2 (dotplot, dotway, pairs, max, maxi, maxj);
+		System.out.println();
+		System.out.println("Score: " + max);
+		System.out.println("Length: " + length);
+		System.out.println("Matches: " + matches);
+		System.out.println("Replacements: " + replacements);
+		System.out.println("Deletions/Insertions: " + deletions);
+		System.exit(1);
 	}
 	
 	private static void printAlignmentPair1(int[][]dotplot, char[][]dotway, String[] pairs, int max, int i, int j) {
@@ -88,20 +96,29 @@ public class alignment {
 	
 	private static void printAlignmentBetween(int[][]dotplot, char[][]dotway, String[] pairs, int max, int i, int j) {
 		String Between ="";
+		length=0;
+		matches=0;
+		replacements=0;
+		deletions=0;
 		while (dotplot[i][j]!=0){
+			length++;
 			switch (dotway[i][j]){
 				case 'l': i = i-1;
 						Between= Between + " ";
+						deletions++;
 						break;
 				case 'u': j = j-1;
 						Between = Between + " ";
+						deletions++;
 						break;
 				case 'd': i=i-1;
 						j= j-1;
 						if (pairs[0].charAt(i) == pairs[1].charAt(j)){
-							Between = Between + "|";	
+							Between = Between + "|";
+							matches++;
 						}
 						else Between = Between + ".";
+						replacements++;
 						break;
 				default: break;
 			}
