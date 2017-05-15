@@ -60,7 +60,7 @@ public class alignment {
 				}
 			}
 		}
-		System.out.println("Alignment:");
+		System.out.println("Best Alignment:");
 		printAlignmentPair1 (dotplot, dotway, pairs, max, maxi, maxj);
 		printAlignmentBetween (dotplot, dotway, pairs, max, maxi, maxj);
 		printAlignmentPair2 (dotplot, dotway, pairs, max, maxi, maxj);
@@ -178,14 +178,17 @@ public class alignment {
 		String temp;
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			for (int i=0; i<2;i++){
-	            temp = br.readLine();
-	            if(temp != null){
-	                while(temp.charAt(0) == '>'){
+				pairs[i]="";
+				temp = br.readLine();
+				while (temp.charAt(0) == '>'){
+					temp = br.readLine();
+				}
+	            while(temp.charAt(0) != '>'){
+	            	pairs[i]=pairs[i]+temp;
 	                temp = br.readLine();
+	                if (temp== null) break;
 	                }
-	            pairs[i]=temp;
 	            }
-			}
         }catch(IOException e){
             e.printStackTrace();
         }
