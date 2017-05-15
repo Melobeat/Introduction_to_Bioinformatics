@@ -117,8 +117,10 @@ public class alignment {
 							Between = Between + "|";
 							matches++;
 						}
-						else Between = Between + ".";
-						replacements++;
+						else {
+							Between = Between + ".";
+							replacements++;
+						}
 						break;
 				default: break;
 			}
