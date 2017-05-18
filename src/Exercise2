@@ -6,21 +6,23 @@ public class alignment {
 	
 	
 	private static void fillDotplot(String[] pairs, int[][] matrix) {
-		int dotplot[][] = new int[pairs[0].length()][pairs[1].length()];
-		char dotway [][] = new char[pairs[0].length()][pairs[1].length()];
+		int s0= pairs[0].length()+1;
+		int s1 = pairs[1].length()+1;
+		int dotplot[][] = new int[s0][s1];
+		char dotway[][] = new char[s0][s1];
 		//1.Zeile auf Null setzen
-		for (int i=0; i < pairs[0].length(); i++){
+		for (int i=0; i < s0; i++){
 			dotplot[i][0]=0;
 			dotway[i][0]='x';
 		}
 		//1.Spalte auf Null setzen
-		for (int i=0; i < pairs[1].length(); i++){
+		for (int i=0; i < s1; i++){
 			dotplot[0][i]=0;
 			dotway[0][i]='x';
 		}
 		// Berechne die Matrixwerte
-		for (int i=1; i<pairs[0].length(); i++){
-			for(int j=1; j < pairs[1].length();j++){
+		for (int i=1; i < s0; i++){
+			for(int j=1; j < s1; j++){
 				int l = dotplot[i-1][j]+gapCost;
 				int u = dotplot[i][j-1]+gapCost;
 				int d = dotplot[i-1][j-1]+alignCost(pairs, matrix, i,j);
@@ -51,8 +53,8 @@ public class alignment {
 		int max = 0;
 		int maxi = 0;
 		int maxj = 0;
-		for (int i=1; i<pairs[0].length(); i++){
-			for(int j=1; j < pairs[1].length();j++){
+		for (int i=1; i<=pairs[0].length(); i++){
+			for(int j=1; j <= pairs[1].length();j++){
 				if (dotplot[i][j] > max){ 
 					max = dotplot[i][j];
 					maxi = i;
@@ -67,9 +69,12 @@ public class alignment {
 		System.out.println();
 		System.out.println("Score: " + max);
 		System.out.println("Length: " + length);
-		System.out.println("Matches: " + matches);
+		float similarity = matches*100/length;
+		System.out.println("Matches: " + matches + " (similarity: " + similarity + "%)");
 		System.out.println("Replacements: " + replacements);
 		System.out.println("Deletions/Insertions: " + deletions);
+		
+		System.out.println();
 		System.exit(1);
 	}
 	
@@ -154,9 +159,9 @@ public class alignment {
 
 	
 	private static int alignCost(String[] pairs, int[][] matrix, int i, int j) {
-		char base1 = pairs[0].charAt(i);
+		char base1 = pairs[0].charAt(i-1);
 		int k = baseNumber (base1);
-		char base2 = pairs[1].charAt(j);
+		char base2 = pairs[1].charAt(j-1);
 		int l = baseNumber(base2);
 		return matrix[k][l];
 	}
