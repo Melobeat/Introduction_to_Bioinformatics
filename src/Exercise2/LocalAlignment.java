@@ -3,7 +3,6 @@ package Exercise2;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class LocalAlignment {
     private final static int GAP_COST = -8;
@@ -222,7 +221,7 @@ public class LocalAlignment {
     }
 
     private static int[][] loadMatrix(String file) {
-        int[][] matrix = new int[5][5];
+        int[][] matrix = new int[4][4];
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String sCurrentLine;
@@ -247,17 +246,11 @@ public class LocalAlignment {
                 }
             }
 
-            for (int i = 0; i < 5; i++) {
-                matrix[i][4] = GAP_COST;
-                matrix[4][i] = GAP_COST;
-            }
-
         } catch (IOException e) {
             System.out.println(e.toString());
             e.printStackTrace();
         }
 
-        System.out.println(Arrays.deepToString(matrix));
         return matrix;
     }
 
