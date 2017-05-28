@@ -3,6 +3,7 @@ package Exercise2;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class LocalAlignment {
     private final static int GAP_COST = -8;
@@ -65,9 +66,9 @@ public class LocalAlignment {
             }
         }
         System.out.println("Best Alignment:");
-        printAlignmentPair(dotplot, dotway, pairs[0], maxi, maxj);
+        printAlignmentPair1(dotplot, dotway, pairs[0], maxi, maxj);
         printAlignmentBetween(dotplot, dotway, pairs, maxi, maxj);
-        printAlignmentPair(dotplot, dotway, pairs[1], maxi, maxj);
+        printAlignmentPair2(dotplot, dotway, pairs[1], maxi, maxj);
         System.out.println();
         System.out.println("Score: " + max);
         System.out.println("Length: " + length);
@@ -80,7 +81,7 @@ public class LocalAlignment {
         System.exit(1);
     }
 
-    private static void printAlignmentPair(int[][] dotplot, char[][] dotway, String pair, int i, int j) {
+    private static void printAlignmentPair1(int[][] dotplot, char[][] dotway, String pair, int i, int j) {
         StringBuilder dna1 = new StringBuilder("");
         while (dotplot[i][j] != 0) {
             switch (dotway[i][j]) {
@@ -102,6 +103,30 @@ public class LocalAlignment {
             }
         }
         System.out.println(dna1.reverse().toString());
+    }
+
+    private static void printAlignmentPair2(int[][] dotplot, char[][] dotway, String pair, int i, int j) {
+        StringBuilder dna2 = new StringBuilder("");
+        while (dotplot[i][j] != 0) {
+            switch (dotway[i][j]) {
+                case 'l':
+                    i = i - 1;
+                    dna2.append("_");
+                    break;
+                case 'u':
+                    j = j - 1;
+                    dna2.append(pair.charAt(j));
+                    break;
+                case 'd':
+                    i = i - 1;
+                    j = j - 1;
+                    dna2.append(pair.charAt(j));
+                    break;
+                default:
+                    break;
+            }
+        }
+        System.out.println(dna2.reverse().toString());
     }
 
     private static void printAlignmentBetween(int[][] dotplot, char[][] dotway, String[] pairs, int i, int j) {
@@ -197,7 +222,7 @@ public class LocalAlignment {
     }
 
     private static int[][] loadMatrix(String file) {
-        int[][] matrix = new int[4][4];
+        int[][] matrix = new int[5][5];
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String sCurrentLine;
@@ -221,18 +246,25 @@ public class LocalAlignment {
                     firstLine = false;
                 }
             }
+
+            for (int i = 0; i < 5; i++) {
+                matrix[i][4] = GAP_COST;
+                matrix[4][i] = GAP_COST;
+            }
+
         } catch (IOException e) {
             System.out.println(e.toString());
             e.printStackTrace();
         }
 
+        System.out.println(Arrays.deepToString(matrix));
         return matrix;
     }
 
     public static void main(String[] args) {
 
         if (args.length != 2) {
-            System.out.println("Geben Sie bitte \"pairs.fasta\" und \"matrix.txt\" als Argumente an!");
+            System.out.println("Geben Sie bitte \"pair.fasta\" und \"matrix.txt\" als Argumente an!");
             System.exit(1);
         }
 
