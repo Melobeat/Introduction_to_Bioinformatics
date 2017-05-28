@@ -9,23 +9,24 @@ public class LocalAlignment {
     private static int length, matches, replacements, deletions;
 
     private static void fillDotplot(String[] pairs, int[][] matrix) {
-        int s0 = pairs[0].length() + 1;
-        int s1 = pairs[1].length() + 1;
-        int dotplot[][] = new int[s0][s1];
-        char dotway[][] = new char[s0][s1];
+        int dotplot[][] = new int[pairs[0].length() + 1][pairs[1].length() + 1];
+        char dotway[][] = new char[pairs[0].length() + 1][pairs[1].length() + 1];
+
         //1.Zeile auf Null setzen
-        for (int i = 0; i < s0; i++) {
+        for (int i = 0; i < pairs[0].length() + 1; i++) {
             dotplot[i][0] = 0;
             dotway[i][0] = 'x';
         }
+
         //1.Spalte auf Null setzen
-        for (int i = 0; i < s1; i++) {
+        for (int i = 0; i < pairs[1].length() + 1; i++) {
             dotplot[0][i] = 0;
             dotway[0][i] = 'x';
         }
+
         // Berechne die Matrixwerte
-        for (int i = 1; i < s0; i++) {
-            for (int j = 1; j < s1; j++) {
+        for (int i = 1; i < pairs[0].length() + 1; i++) {
+            for (int j = 1; j < pairs[1].length() + 1; j++) {
                 int l = dotplot[i - 1][j] + GAP_COST;
                 int u = dotplot[i][j - 1] + GAP_COST;
                 int d = dotplot[i - 1][j - 1] + alignCost(pairs, matrix, i, j);
@@ -46,6 +47,7 @@ public class LocalAlignment {
                 }
             }
         }
+
         findeMax(dotplot, dotway, pairs);
     }
 
@@ -195,41 +197,39 @@ public class LocalAlignment {
     }
 
     private static int[][] loadMatrix(String file) {
-        int[][] matrix = new int[5][5];
-        String temp;
+        int[][] matrix = new int[4][4];
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            temp = br.readLine();
-            if (temp != null) {
-                while (temp.charAt(0) == '#') {  //alle Zeilen die mit # anfangen herausnehmen
-                    temp = br.readLine();
-                }
-                temp = br.readLine(); //erste Zeile mit ATGC herausnehmen
-                int j = 0;
-                while (temp != null) {
-                    for (int i = 4; i < temp.length(); i = i + 4) {
-                        if (temp.charAt(i - 1) == '-')
-                            matrix[j][i / 4 - 1] = (Character.getNumericValue(temp.charAt(i))) * -1;
-                        else matrix[j][i / 4 - 1] = (Character.getNumericValue(temp.charAt(i)));
+            String sCurrentLine;
+            String[] currentTokens;
+            boolean firstLine = true;
+            int j = 0;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                if (sCurrentLine.charAt(0) != '#' && !firstLine) {
+                    currentTokens = sCurrentLine.split("\\s+");
+
+                    for (int i = 1; i < currentTokens.length; i++) {
+                        if (currentTokens[i].charAt(0) == '-') {
+                            matrix[j][i - 1] = Character.getNumericValue(currentTokens[i].charAt(1)) * -1;
+                        } else {
+                            matrix[j][i - 1] = Character.getNumericValue(currentTokens[i].charAt(0));
+                        }
                     }
-                    if (j == 4)
-                        break;
                     j++;
-                    temp = br.readLine();
-                }
-                for (int k = 0; k < matrix.length; k++) {
-                    matrix[4][k] = GAP_COST;
-                    matrix[k][4] = GAP_COST;
+                } else if (sCurrentLine.charAt(0) != '#' && firstLine) {
+                    firstLine = false;
                 }
             }
         } catch (IOException e) {
+            System.out.println(e.toString());
             e.printStackTrace();
         }
 
         return matrix;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         if (args.length != 2) {
             System.out.println("Geben Sie bitte \"pairs.fasta\" und \"matrix.txt\" als Argumente an!");
