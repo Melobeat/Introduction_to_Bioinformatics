@@ -24,6 +24,7 @@ hs_err_pid*
 ### User template
 
 *.fasta
+*.txt
 
 # IntelliJ project files
 .idea
